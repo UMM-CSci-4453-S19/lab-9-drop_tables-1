@@ -5,6 +5,7 @@ angular.module('buttons',[])
 
 function ButtonCtrl($scope,buttonApi){
    $scope.buttons=[]; //Initially all was still
+   $scope.users=[];
    $scope.transactionState=[];
    $scope.total=0;
    $scope.errorMessage='';
@@ -14,6 +15,10 @@ function ButtonCtrl($scope,buttonApi){
    $scope.transactionVoid=transactionVoid;
    $scope.returnTotal=returnTotal;
    $scope.deleteButtonClick=deleteButtonClick;
+   $scope.refreshUsers=refreshUsers;
+   $scope.userClick=userClick;
+   $scope.logOut=logOut;
+   $scope.loggedIn=false;
 
    var loading = false;
 
@@ -33,6 +38,35 @@ function ButtonCtrl($scope,buttonApi){
           loading=false;
       });
  }
+ function refreshUsers(){
+   loading=true;
+   $scope.errorMessage='';
+   buttonApi.getUsers()
+     .success(function(data){
+        $scope.users=data;
+        loading=false;
+     })
+     .error(function () {
+         $scope.errorMessage="Unable to load Buttons:  Database request failed";
+         loading=false;
+     });
+}
+
+function checkIfLoggedIn() {
+  loading=true;
+  $scope.errorMessage='';
+  buttonApi.checkIfLoggedIn()
+      .success(function(data){
+        console.log(data);
+        $scope.loggedIn=data.length>0;
+        loading=false;
+      }).
+      error(function() {
+        $scope.errorMessage="Failed to check if a user is logged in";
+        loading=false;
+      })
+}
+
   function buttonClick($event){
      $scope.errorMessage='';
      buttonApi.clickButton($event.target.id)
@@ -42,7 +76,20 @@ function ButtonCtrl($scope,buttonApi){
      refreshTransaction();
   }
 
-  function deleteButtonClick($event){
+  function userClick($event){
+    $scope.loggedIn = true;
+     $scope.errorMessage='';
+     buttonApi.clickUser($event.target.id)
+        .success(function(){})
+        .error(function(){$scope.errorMessage="Unable click";});
+  }
+
+  function logOut() {
+    $scope.loggedIn = false;
+    buttonApi.removeUsers().success(function(){}).error(function(){$scope.errorMessage="Failed to log out"});
+  }
+
+  function deleteButtonClick($event){removeUsers
      $scope.errorMessage='';
      buttonApi.deleteTransaction($event.target.id)
         .success(function(){})
@@ -73,7 +120,7 @@ function ButtonCtrl($scope,buttonApi){
              console.log("success")
           })
           .error(function () {
-              $scope.errorMessage="Failed to truncate";
+              //$scope.errorMessage="Failed to truncate";Item Name |
               loading=false;
           });
           $scope.total = 0;
@@ -96,7 +143,8 @@ function ButtonCtrl($scope,buttonApi){
   returnTotal();
   refreshTransaction();
   refreshButtons();  //make sure the buttons are loaded
-
+  refreshUsers();
+  checkIfLoggedIn();
 }
 
 function buttonApi($http,apiUrl){
@@ -105,8 +153,17 @@ function buttonApi($http,apiUrl){
       var url = apiUrl + '/buttons';
       return $http.get(url);
     },
+    getUsers: function(){
+      var url = apiUrl + '/user';
+      return $http.get(url);
+    },
     clickButton: function(id){
       var url = apiUrl+'/click?id='+id;
+//      console.log("Attempting with "+url);
+      return $http.get(url); // Easy enough to do this way
+    },
+    clickUser: function(id){
+      var url = apiUrl+'/clickuser?id='+id;
 //      console.log("Attempting with "+url);
       return $http.get(url); // Easy enough to do this way
     },
@@ -124,6 +181,14 @@ function buttonApi($http,apiUrl){
     },
     deleteTransaction: function(id){
       var url = apiUrl + '/deleteclick?id=' +id;
+      return $http.get(url);
+    },
+    removeUsers: function(){
+      var url = apiUrl + '/removeUsers';
+      return $http.get(url);
+    },
+    checkIfLoggedIn: function(){
+      var url = apiUrl + '/checkIfLoggedIn';
       return $http.get(url);
     }
  };

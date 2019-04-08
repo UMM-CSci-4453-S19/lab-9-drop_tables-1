@@ -11,6 +11,13 @@
 <div class="container-fluid">
     <h1>Cash Register (with buttons)</h1>
     <div id="buttons" ng-controller="buttonCtrl" >
+      <div ng-repeat="user in users" ng-if="!loggedIn">
+        <div style="position:absolute;left:{{user.left}}px;top:10"><button id="{{user.id}}" ng-click="userClick($event,'user.id');" >{{user.user}}</button></div>
+      </div>
+      <div ng-if="loggedIn">
+        <button style="left: 400px; position:absolute;" id="logOut" ng-click="logOut();">Log Out</button>
+      </div>
+      <div ng-if="loggedIn">
        <div ng-repeat="button in buttons">
          <div style="position:absolute;left:{{button.left}}px;top:{{button.top}}px"><button id="{{button.buttonID}}" ng-click="buttonClick($event,'button.buttonID');" >{{button.label}}</button></div>
        </div>
@@ -39,6 +46,7 @@
            <h3 class="text-danger">{{errorMessage}}</h3>
          </div>
        </div>
+     </div>
      </div>
 </div>
 </body>

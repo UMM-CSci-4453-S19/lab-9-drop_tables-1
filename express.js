@@ -30,6 +30,22 @@ app.get("/buttons",function(req,res){
   }})(res));
 });
 
+app.get("/user",function(req,res){
+  var sql = 'SELECT * FROM users';
+  connection.query(sql,(function(res){return function(err,rows,fields){
+     var dbfarr = new Array(rows.length);
+     rows.forEach(function (item, index) {
+   	dbfarr[index] = {"user":item.username,
+   		"id":item.id,
+      "left": (300 + index * 70).toString()};
+     })
+     if(err){console.log("We have an error:");
+             console.log(err);}
+     res.send(dbfarr);
+     console.log(dbfarr);
+  }})(res));
+});
+
 // Gets the button information form our transaction table and puts it in a table
 app.get("/transaction",function(req,res){
   // Setting up and making the SQL query
@@ -54,11 +70,34 @@ app.get("/transaction",function(req,res){
   }})(res));
 });
 
+app.get('/checkIfLoggedIn',function(req,res){
+  var sql = 'SELECT * FROM currentuser';
+  connection.query(sql,(function(res){
+    return function(err,rows,fields){
+      var numUsers = rows;
+      res.send(numUsers);
+    }
+  })(res));
+});
+
 //when a button is clicked the according item is put in transactions
 app.get("/click",function(req,res){
   var id = req.param('id');
   //inserts the item which the button_id refers to into the transactions table
   var sql = 'insert into transactions (button_id, label, invID, price) select button_id, label, invID, price from till_buttons where button_id = ?;'
+  console.log("Attempting sql ->"+sql+"<-");
+
+  connection.query(sql, id,(function(res){return function(err,rows,fields){
+     if(err){console.log("We have an insertion error:");
+             console.log(err);}
+     res.send(err); // Let the upstream guy know how it went
+  }})(res));
+});
+
+app.get("/clickuser",function(req,res){
+  var id = req.param('id');
+  //inserts the item which the button_id refers to into the transactions table
+  var sql = 'insert into currentuser (id, username) select id, username from users where id = ?;'
   console.log("Attempting sql ->"+sql+"<-");
 
   connection.query(sql, id,(function(res){return function(err,rows,fields){
@@ -95,6 +134,19 @@ app.get("/void",function(req,res){
   })
 });
 
+app.get('/removeUsers',function(req,res){
+  var sql = 'truncate currentuser';
+  console.log('Attempting sql ->'+sql+'<-');
+
+  connection.query(sql, function(err,rows,fields){
+    if(err){
+      console.log("Errored on truncation");
+      console.log(err);
+  }
+  res.send(err);
+  })
+});
+
 //Adds all the prices in transactions
 app.get("/total",function(req,res){
   //selects all the items in transactions and calculates the sum of their prices
@@ -114,5 +166,7 @@ app.get("/total",function(req,res){
      res.send(totals);
   }})(res));
 });
+
+
 
 app.listen(port);
