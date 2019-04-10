@@ -83,11 +83,15 @@ app.get('/checkIfLoggedIn',function(req,res){
 //when a button is clicked the according item is put in transactions
 app.get("/click",function(req,res){
   var id = req.param('id');
+  var user = req.param('user');
+  console.log(user)
+  var params = [id, user]
   //inserts the item which the button_id refers to into the transactions table
-  var sql = 'insert into transactions (button_id, label, invID, price) select button_id, label, invID, price from till_buttons where button_id = ?;'
+  var sql = 'insert into transactions (button_id, label, invID, price, user, userid) select x.button_id, x.label, x.invID, x.price, y.username, y.id from till_buttons x, users y where x.button_id = ? and y.id = ?;'
+  //var sql = 'insert into transactions (button_id, label, invID, price, user, userid) select x.button_id, x.label, x.invID, x.price, y.user, y.userid from till_buttons x, user y where x.button_id =' ' and y.userid = ?;'
   console.log("Attempting sql ->"+sql+"<-");
 
-  connection.query(sql, id,(function(res){return function(err,rows,fields){
+  connection.query(sql, params,(function(res){return function(err,rows,fields){
      if(err){console.log("We have an insertion error:");
              console.log(err);}
      res.send(err); // Let the upstream guy know how it went

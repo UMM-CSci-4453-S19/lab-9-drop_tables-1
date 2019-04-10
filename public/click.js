@@ -19,6 +19,7 @@ function ButtonCtrl($scope,buttonApi){
    $scope.userClick=userClick;
    $scope.logOut=logOut;
    $scope.loggedIn=false;
+   $scope.currentuser=0;
 
    var loading = false;
 
@@ -59,6 +60,9 @@ function checkIfLoggedIn() {
       .success(function(data){
         console.log(data);
         $scope.loggedIn=data.length>0;
+        if($scope.loggedIn){
+          $scope.currentuser=data[0].id;
+        }
         loading=false;
       }).
       error(function() {
@@ -69,7 +73,7 @@ function checkIfLoggedIn() {
 
   function buttonClick($event){
      $scope.errorMessage='';
-     buttonApi.clickButton($event.target.id)
+     buttonApi.clickButton($event.target.id, $scope.currentuser)
         .success(function(){})
         .error(function(){$scope.errorMessage="Unable click";});
      returnTotal();
@@ -89,7 +93,7 @@ function checkIfLoggedIn() {
     buttonApi.removeUsers().success(function(){}).error(function(){$scope.errorMessage="Failed to log out"});
   }
 
-  function deleteButtonClick($event){removeUsers
+  function deleteButtonClick($event){
      $scope.errorMessage='';
      buttonApi.deleteTransaction($event.target.id)
         .success(function(){})
@@ -157,8 +161,8 @@ function buttonApi($http,apiUrl){
       var url = apiUrl + '/user';
       return $http.get(url);
     },
-    clickButton: function(id){
-      var url = apiUrl+'/click?id='+id;
+    clickButton: function(id, user){
+      var url = apiUrl+'/click?id='+id+'&user='+user;
 //      console.log("Attempting with "+url);
       return $http.get(url); // Easy enough to do this way
     },
