@@ -86,11 +86,13 @@ function checkIfLoggedIn() {
      buttonApi.clickUser($event.target.id)
         .success(function(){})
         .error(function(){$scope.errorMessage="Unable click";});
+    checkIfLoggedIn();
   }
 
   function logOut() {
     $scope.loggedIn = false;
     buttonApi.removeUsers().success(function(){}).error(function(){$scope.errorMessage="Failed to log out"});
+    $scope.currentuser=0;
   }
 
   function deleteButtonClick($event){
