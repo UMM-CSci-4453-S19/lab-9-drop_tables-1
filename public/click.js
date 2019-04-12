@@ -20,6 +20,9 @@ function ButtonCtrl($scope,buttonApi){
    $scope.logOut=logOut;
    $scope.loggedIn=false;
    $scope.currentuser=0;
+   $scope.getMax=getMax;
+   $scope.max=0;
+   $scope.saleClick=saleClick;
 
    var loading = false;
 
@@ -39,6 +42,26 @@ function ButtonCtrl($scope,buttonApi){
           loading=false;
       });
  }
+
+ function getMax(){
+   loading=true;
+   $scope.errorMessage='';
+   buttonApi.getMax()
+     .success(function(data){
+        $scope.max=data[0].max;
+        if($scope.max == null){
+          $scope.max = 0;
+        } else {
+          $scope.max = $scope.max + 1;
+        }
+        loading=false;
+     })
+     .error(function () {
+         $scope.errorMessage="Unable to load Buttons:  Database request failed";
+         loading=false;
+     });
+}
+
  function refreshUsers(){
    loading=true;
    $scope.errorMessage='';
@@ -70,6 +93,20 @@ function checkIfLoggedIn() {
         loading=false;
       })
 }
+
+  function saleClick($event){
+     $scope.errorMessage='';
+     buttonApi.clickSale($scope.currentuser, $scope.max)
+        .success(function(){})
+        .error(function(){$scope.errorMessage="Unable click";});
+     // returnTotal();
+     refreshTransaction();
+     $scope.max = $scope.max + 1;
+//     $scope.total = 0;
+     console.log($scope.total)
+     transactionVoid($event);
+     console.log($scope.total)
+  }
 
   function buttonClick($event){
      $scope.errorMessage='';
@@ -146,11 +183,13 @@ function checkIfLoggedIn() {
           loading=false;
       });
   }
+
   returnTotal();
   refreshTransaction();
   refreshButtons();  //make sure the buttons are loaded
   refreshUsers();
   checkIfLoggedIn();
+  getMax();
 }
 
 function buttonApi($http,apiUrl){
@@ -159,12 +198,21 @@ function buttonApi($http,apiUrl){
       var url = apiUrl + '/buttons';
       return $http.get(url);
     },
+    getMax: function(){
+      var url = apiUrl + '/max';
+      return $http.get(url);
+    },
     getUsers: function(){
       var url = apiUrl + '/user';
       return $http.get(url);
     },
     clickButton: function(id, user){
       var url = apiUrl+'/click?id='+id+'&user='+user;
+//      console.log("Attempting with "+url);
+      return $http.get(url); // Easy enough to do this way
+    },
+    clickSale: function(user, max){
+      var url = apiUrl+'/addprevious?user='+user+'&max='+max;
 //      console.log("Attempting with "+url);
       return $http.get(url); // Easy enough to do this way
     },

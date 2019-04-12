@@ -46,6 +46,20 @@ app.get("/user",function(req,res){
   }})(res));
 });
 
+app.get("/max",function(req,res){
+  var sql = 'SELECT MAX(TransactionID) as max FROM previous_transactions';
+  connection.query(sql,(function(res){return function(err,rows,fields){
+     var dbfarr = new Array(rows.length);
+     rows.forEach(function (item, index) {
+   	dbfarr[index] = {"max":item.max};
+     })
+     if(err){console.log("We have an error:");
+             console.log(err);}
+     res.send(dbfarr);
+     console.log(dbfarr);
+  }})(res));
+});
+
 // Gets the button information form our transaction table and puts it in a table
 app.get("/transaction",function(req,res){
   // Setting up and making the SQL query
@@ -87,7 +101,24 @@ app.get("/click",function(req,res){
   console.log(user)
   var params = [id, user]
   //inserts the item which the button_id refers to into the transactions table
-  var sql = 'insert into transactions (button_id, label, invID, price, user, userid) select x.button_id, x.label, x.invID, x.price, y.username, y.id from till_buttons x, users y where x.button_id = ? and y.id = ?;'
+  var sql = 'insert into transactions (button_id, label, invID, price, user, userid, timestamp) select x.button_id, x.label, x.invID, x.price, y.username, y.id, NOW() from till_buttons x, users y where x.button_id = ? and y.id = ?;'
+  //var sql = 'insert into transactions (button_id, label, invID, price, user, userid) select x.button_id, x.label, x.invID, x.price, y.user, y.userid from till_buttons x, user y where x.button_id =' ' and y.userid = ?;'
+  console.log("Attempting sql ->"+sql+"<-");
+
+  connection.query(sql, params,(function(res){return function(err,rows,fields){
+     if(err){console.log("We have an insertion error:");
+             console.log(err);}
+     res.send(err); // Let the upstream guy know how it went
+  }})(res));
+});
+
+app.get("/addprevious",function(req,res){
+  var user = req.param('user');
+  var max = req.param('max');
+  console.log(user)
+  var params = [max, user]
+  //inserts the item which the button_id refers to into the transactions table
+  var sql = 'insert into previous_transactions (button_id, label, invID, price, item_id, user, userid, timestamp, transactionID) select x.button_id, x.label, x.invID, x.price, x.item_id, x.user, x.userid, x.timestamp, ? from transactions x;'
   //var sql = 'insert into transactions (button_id, label, invID, price, user, userid) select x.button_id, x.label, x.invID, x.price, y.user, y.userid from till_buttons x, user y where x.button_id =' ' and y.userid = ?;'
   console.log("Attempting sql ->"+sql+"<-");
 
