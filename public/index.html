@@ -40,6 +40,10 @@
          <tr>
            <td><button ng-click="saleClick($event);">Sale</button></td>
            <td><button ng-click="transactionVoid($event);">Void</button></td>
+           <td>
+             <button ng-click="getReceipt();">Download Receipt</button>
+             <a id="downloadAnchorElem" style="display:none"></a>
+           </td>
          </tr>
        </table>
        <div style="position:fixed;height:50px;bottom:0px;left:0px;right:0px;margin-bottom:0px"} ng-show="errorMessage != ''">

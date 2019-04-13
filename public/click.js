@@ -23,6 +23,7 @@ function ButtonCtrl($scope,buttonApi){
    $scope.getMax=getMax;
    $scope.max=0;
    $scope.saleClick=saleClick;
+   $scope.getReceipt=getReceipt;
 
    var loading = false;
 
@@ -96,6 +97,7 @@ function checkIfLoggedIn() {
 
   function saleClick($event){
      $scope.errorMessage='';
+     $scope.getReceipt();
      buttonApi.clickSale($scope.currentuser, $scope.max)
         .success(function(){})
         .error(function(){$scope.errorMessage="Unable click";});
@@ -184,6 +186,33 @@ function checkIfLoggedIn() {
       });
   }
 
+  function getReceipt() {
+    $scope.errorMessage = '';
+    buttonApi.getReceipt().success(function(data){
+      console.log("Data:")
+      console.log(data);
+      var total = 0;
+      for(var i = 0; i < data.length; i++) {
+        total += data[i]["Total for item"];
+      }
+
+      totalObj = {};
+      totalObj["Total Cost"] = total;
+
+      data.push(totalObj);
+
+      console.log(data);
+      console.log("Converting to JSON");
+      var jsonObj = JSON.parse(JSON.stringify(data));
+      console.log("Converted to json, setting dataStr");
+      var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonObj));
+      var dlAnchorElem = document.getElementById('downloadAnchorElem');
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", "receipt.json");
+      dlAnchorElem.click();
+    })
+  }
+
   returnTotal();
   refreshTransaction();
   refreshButtons();  //make sure the buttons are loaded
@@ -243,6 +272,10 @@ function buttonApi($http,apiUrl){
     },
     checkIfLoggedIn: function(){
       var url = apiUrl + '/checkIfLoggedIn';
+      return $http.get(url);
+    },
+    getReceipt: function(){
+      var url = apiUrl + '/getReceipt';
       return $http.get(url);
     }
  };

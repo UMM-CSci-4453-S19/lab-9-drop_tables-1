@@ -188,7 +188,9 @@ app.get("/total",function(req,res){
   var sql = 'select sum(price) as total from transactions;';
   console.log("Attempting sql ->"+sql+"<-");
 
-  connection.query(sql,(function(res){return function(err,rows,fields){
+  connection.query(sql,(function(res){
+    console.log(res);
+    return function(err,rows,fields){
      var total = rows[0].total;
      var totals = '0';
      if (total != null) {
@@ -200,6 +202,35 @@ app.get("/total",function(req,res){
              console.log(err);}
      res.send(totals);
   }})(res));
+});
+
+app.get("/getReceipt", function(req, res) {
+  var sql = 'SELECT DISTINCT label, COUNT(label) as numBought, price, price*COUNT(label) as Cost from transactions group by label;';
+
+  connection.query(sql, function(err,rows,fields) {
+      if(err) {
+        console.log(err);
+      }
+      jsonObj = [];
+
+      for(var i = 0; i < rows.length; i++) {
+        var label = rows[i].label;
+        var numBought = rows[i].numBought;
+        var individualCost = rows[i].price;
+        var totalCost = rows[i].Cost;
+
+        item = {};
+        item["Item"] = label;
+        item["Number Bought"] = numBought;
+        item["Cost per Item"] = individualCost;
+        item["Total for item"] = totalCost;
+        console.log("Pushing the item");
+        console.log(item);
+        jsonObj.push(item);
+      }
+
+      res.send(jsonObj);
+    })
 });
 
 
