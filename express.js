@@ -107,8 +107,9 @@ app.get("/click",function(req,res){
 
   connection.query(sql, params,(function(res){return function(err,rows,fields){
      if(err){console.log("We have an insertion error:");
-             console.log(err);}
-     res.send(err); // Let the upstream guy know how it went
+             console.log(err);
+             res.send(err);} else
+     {res.send("Successfully added button to transactions");} // Let the upstream guy know how it went
   }})(res));
 });
 
@@ -124,8 +125,9 @@ app.get("/addprevious",function(req,res){
 
   connection.query(sql, params,(function(res){return function(err,rows,fields){
      if(err){console.log("We have an insertion error:");
-             console.log(err);}
-     res.send(err); // Let the upstream guy know how it went
+             console.log(err);
+             res.send(err);} else
+     {res.send("Successfully added to previous transactions");} // Let the upstream guy know how it went
   }})(res));
 });
 
@@ -137,8 +139,9 @@ app.get("/clickuser",function(req,res){
 
   connection.query(sql, id,(function(res){return function(err,rows,fields){
      if(err){console.log("We have an insertion error:");
-             console.log(err);}
-     res.send(err); // Let the upstream guy know how it went
+             console.log(err);
+             res.send(err);} else
+     {res.send("Successfully added user");} // Let the upstream guy know how it went
   }})(res));
 });
 
@@ -151,8 +154,10 @@ app.get("/deleteclick",function(req,res){
 
   connection.query(sql, id,(function(res){return function(err,rows,fields){
      if(err){console.log("We have an deletion error:");
-             console.log(err);}
-     res.send(err); // Let the upstream guy know how it went
+             console.log(err);
+             res.send(err);} else {
+     res.send("Successfully deleted"); // Let the upstream guy know how it went
+   }
   }})(res));
 });
 
@@ -164,8 +169,10 @@ app.get("/void",function(req,res){
 
   connection.query(sql, function(err,rows,fields){
      if(err){console.log("We have an truncation error:");
-             console.log(err);}
-     res.send(err); // Let the upstream guy know how it went
+             console.log(err);
+             res.send(err);} else {
+     res.send("Successfully void"); // Let the upstream guy know how it went
+   }
   })
 });
 
@@ -177,8 +184,9 @@ app.get('/removeUsers',function(req,res){
     if(err){
       console.log("Errored on truncation");
       console.log(err);
-  }
-  res.send(err);
+      res.send(err);
+  } else
+  {res.send("Successfully removed users");}
   })
 });
 
