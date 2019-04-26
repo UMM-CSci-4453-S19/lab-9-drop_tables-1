@@ -101,11 +101,46 @@ price: 80
 }]
 ```
 # CheckIfLoggedIn
+The current logged in user exists here. The JSON returned states the current logged in user as well as the user ID. The JSON looks like this:
+```JSON
+[{
+id: 44,
+username: "oBaMa"
+}]
+```
 # Click
+Click adds the clicked button item to the transactions list. The click collects the: button_id, label, invID, price, user, userid, timestamp) select x.button_id, x.label, x.invID, x.price, y.username, and y.id. If this has been collected and the item has been added to the transactions list, this response is displayed: "Successfully added button to transactions"
 # AddPrevious
+AddPrevious does the same thing as Click, but adds the clicked button item to the till_items list. This list is used as a record of every item that has been purchased so far. As with Click, button_id, label, invID, price, user, userid, timestamp) select x.button_id, x.label, x.invID, x.price, y.username, and y.id is collected. Once put into the till_items list, "Successfully added to previous transactions" is displayed.
 # ClickUser
+ClickUser?id= adds a user to the currentuser list. If the user has been added, "Successfully added user" is returned.
 # DeleteClick
+DeleteClick removes the item that the delete button was clicked for from the transactions list. If the item has been Successfully removed, "Successfully deleted" is returned.
 # Void
+Void truncates all of the items in the transactions list. If the items have been Successfully removed, "Successfully void" is returned
 # RemoveUsers
+RemoveUsers truncates the currentuser list. If all of the users have been removed, "Successfully removed users" is returned
 # Total
+Total returns the total cost of all of the items in the transactions list. The total is returned as a string.
 # getReceipt
+getReceipt returns a dialog box that contains all of the transactions list items. The receipt contains each item, the number of the item bought, cost per item, and total cost for the item. The JSON looks like this:
+```JSON
+[{
+Item: "bananas",
+Number Bought: 2,
+Cost per Item: 1,
+Total for item: 2
+},
+{
+Item: "hamburgers",
+Number Bought: 3,
+Cost per Item: 80,
+Total for item: 240
+},
+{
+Item: "hotdogs",
+Number Bought: 1,
+Cost per Item: 2,
+Total for item: 2
+}]
+```
