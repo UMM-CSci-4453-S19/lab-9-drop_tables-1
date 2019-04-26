@@ -131,7 +131,7 @@ app.get("/addprevious",function(req,res){
   }})(res));
 });
 
-app.get("/clickuser",function(req,res){
+app.get("/clickUser",function(req,res){
   var id = req.param('id');
   //inserts the item which the button_id refers to into the transactions table
   var sql = 'insert into currentuser (id, username) select id, username from users where id = ?;'
